@@ -13,22 +13,90 @@
     <style>
         body { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Professional Print Styles */
+        /* Strict Professional Print Styles for A4 Paper */
         @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; color: black !important; font-size: 12pt; }
-            .print-container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
-            .print-header { display: flex !important; justify-content: space-between; align-items: center; border-bottom: 2px solid #065f46; padding-bottom: 15px; margin-bottom: 20px; }
-            .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            .print-table th, .print-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; font-size: 11pt; }
-            .print-table th { background-color: #f1f5f9 !important; color: #0f172a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .print-signatures { display: flex !important; justify-content: space-between; margin-top: 40px; page-break-inside: avoid; }
-            .print-badge { border: 1px solid #065f46; padding: 2px 8px; border-radius: 4px; font-size: 10pt; }
-            .screen-only { display: none !important; }
+            /* Hide entire screen UI */
+            header, .no-print, .screen-only-ui, button, input[type="text"] {
+                display: none !important;
+            }
+            
+            /* Reset body and container */
+            body {
+                background: white !important;
+                color: #000 !important;
+                font-size: 11pt !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
+            /* Show official print header */
+            .print-header-section {
+                display: block !important;
+                width: 100%;
+                border-bottom: 2px solid #065f46;
+                padding-bottom: 12px;
+                margin-bottom: 20px;
+            }
+
+            /* Show official print signatures */
+            .print-signatures-section {
+                display: flex !important;
+                justify-content: space-between !important;
+                margin-top: 50px !important;
+                page-break-inside: avoid !important;
+                width: 100%;
+            }
+
+            /* Print table styling */
+            .print-table-container {
+                display: block !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin-top: 10px !important;
+            }
+
+            th, td {
+                border: 1px solid #94a3b8 !important;
+                padding: 8px 10px !important;
+                text-align: right !important;
+                font-size: 10.5pt !important;
+                color: #000 !important;
+            }
+
+            th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .print-badge {
+                border: 1px solid #065f46;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 10pt;
+                font-weight: bold;
+            }
         }
+
+        /* Screen Only Elements */
         @media screen {
-            .print-header { display: none; }
-            .print-signatures { display: none; }
+            .print-header-section { display: none; }
+            .print-signatures-section { display: none; }
         }
     </style>
 </head>
@@ -57,28 +125,33 @@
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 flex-grow w-full pb-20 print-container">
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 flex-grow w-full pb-20">
         
-        <!-- Official Print Header (Visible only on print) -->
-        <div class="print-header hidden">
-            <div class="text-right text-xs leading-relaxed">
-                <p class="font-bold">المملكة العربية السعودية</p>
-                <p>وزارة التعليم</p>
-                <p>الإدارة العامة للتعليم بمنطقة تبوك</p>
-                <p class="font-bold text-emerald-800">مدرسة عباد بن بشر الابتدائية</p>
-            </div>
-            <div class="text-center">
-                <h2 class="text-lg font-black text-slate-900 border-b-2 border-emerald-800 pb-1 mb-1">تقرير متابعة الإشراف اليومي</h2>
-                <p id="printDayLabel" class="text-sm font-bold text-slate-700">اليوم: الأحد</p>
-                <p class="text-[11px] text-slate-500">العام الدراسي 1448 هـ - الفصل الدراسي الأول</p>
-            </div>
-            <div class="text-left text-xs leading-relaxed">
-                <p>التاريخ: <span id="printDateString"></span></p>
-                <p>الفصل: الأول 1448 هـ</p>
-            </div>
+        <!-- Official Print Header (Visible ONLY during print) -->
+        <div class="print-header-section hidden">
+            <table style="width: 100%; border: none !important; margin-bottom: 0 !important;">
+                <tr style="border: none !important;">
+                    <td style="border: none !important; text-align: right; width: 33%; font-size: 11pt; line-height: 1.6;">
+                        <strong>المملكة العربية السعودية</strong><br>
+                        وزارة التعليم<br>
+                        الإدارة العامة للتعليم بمنطقة تبوك<br>
+                        <strong>مدرسة عباد بن بشر الابتدائية</strong>
+                    </td>
+                    <td style="border: none !important; text-align: center; width: 34%;">
+                        <h2 style="font-size: 15pt; font-weight: bold; margin-bottom: 5px; color: #065f46;">تقرير متابعة الإشراف اليومي</h2>
+                        <p style="font-size: 12pt; font-weight: bold; margin: 3px 0;" id="printDayLabel">اليوم: الأحد</p>
+                        <p style="font-size: 10pt; color: #475569;">العام الدراسي 1448 هـ - الفصل الدراسي الأول</p>
+                    </td>
+                    <td style="border: none !important; text-align: left; width: 33%; font-size: 11pt; line-height: 1.6;">
+                        <strong>التاريخ:</strong> <span id="printDateString"></span><br>
+                        <strong>الفصل:</strong> الأول 1448 هـ<br>
+                        <strong>الحالة:</strong> رسمي معتمد
+                    </td>
+                </tr>
+            </table>
         </div>
 
-        <!-- Day Selection Tabs (Scrollable on mobile) -->
+        <!-- Day Selection Tabs (No print) -->
         <div class="mb-4 no-print">
             <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="dayTabsContainer">
                 <button onclick="setDay('الأحد')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-700 text-white shadow-sm" data-day="الأحد">الأحد</button>
@@ -89,7 +162,7 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
+        <!-- Statistics Cards (No print) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 no-print">
             <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex justify-between items-start mb-1">
@@ -121,8 +194,8 @@
             </div>
         </div>
 
-        <!-- Mobile Card List & Desktop Table Container -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6 print-shadow">
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6 print-table-container">
             <div class="p-3.5 border-b border-slate-100 flex justify-between items-center bg-slate-50 no-print">
                 <h3 class="font-bold text-slate-700 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-emerald-600"></i> سجل المتابعة اليومية
@@ -130,14 +203,14 @@
                 <span id="activeDayLabel" class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">اليوم: الأحد</span>
             </div>
 
-            <!-- Mobile & Tablet Card List (Visible on smaller screens in screen mode) -->
-            <div id="mobileCardsContainer" class="divide-y divide-slate-100 block md:hidden screen-only">
-                <!-- Populated dynamically via JS -->
+            <!-- Mobile Card View (Screen only) -->
+            <div id="mobileCardsContainer" class="divide-y divide-slate-100 block md:hidden screen-only-ui">
+                <!-- Populated dynamically -->
             </div>
 
-            <!-- Desktop Table View (Used for screen md+ and always for print) -->
+            <!-- Desktop Table View -->
             <div class="overflow-x-auto">
-                <table class="w-full text-right border-collapse print-table">
+                <table class="w-full text-right border-collapse">
                     <thead>
                         <tr class="bg-slate-50 text-slate-500 text-xs font-bold border-b border-slate-100">
                             <th class="p-3.5">الفترة / الفسحة</th>
@@ -148,7 +221,7 @@
                         </tr>
                     </thead>
                     <tbody id="scheduleTableBody" class="divide-y divide-slate-100 text-sm">
-                        <!-- Populated dynamically via JS -->
+                        <!-- Populated dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -166,17 +239,17 @@
             </div>
         </div>
 
-        <!-- Official Print Signatures (Visible only on print) -->
-        <div class="print-signatures hidden">
-            <div class="text-center w-1/2">
-                <p class="font-bold text-sm mb-8">وكيل الشؤون التعليمية</p>
-                <p class="font-bold text-slate-800" id="printVicePrincipalText">...................................</p>
-                <p class="text-xs text-slate-500 mt-1">التوقيع: ...................................</p>
+        <!-- Official Print Signatures (Visible ONLY during print) -->
+        <div class="print-signatures-section hidden">
+            <div style="text-align: center; width: 45%;">
+                <p style="font-weight: bold; font-size: 11pt; margin-bottom: 35px;">وكيل الشؤون التعليمية</p>
+                <p style="font-weight: bold; font-size: 11pt; margin-bottom: 5px;" id="printVicePrincipalText">...................................</p>
+                <p style="font-size: 9.5pt; color: #475569;">التوقيع: ...................................</p>
             </div>
-            <div class="text-center w-1/2">
-                <p class="font-bold text-sm mb-8">مدير المدرسة</p>
-                <p class="font-bold text-slate-800" id="printPrincipalText">...................................</p>
-                <p class="text-xs text-slate-500 mt-1">التوقيع: ...................................</p>
+            <div style="text-align: center; width: 45%;">
+                <p style="font-weight: bold; font-size: 11pt; margin-bottom: 35px;">مدير المدرسة</p>
+                <p style="font-weight: bold; font-size: 11pt; margin-bottom: 5px;" id="printPrincipalText">...................................</p>
+                <p style="font-size: 9.5pt; color: #475569;">التوقيع: ...................................</p>
             </div>
         </div>
 
@@ -235,7 +308,7 @@
         let stateData = {};
 
         try {
-            const saved = localStorage.getItem('supervision_state_1448_mobile');
+            const saved = localStorage.getItem('supervision_state_1448_v2');
             if (saved) stateData = JSON.parse(saved);
         } catch (e) {
             console.error("Storage error", e);
@@ -280,7 +353,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('supervision_state_1448_mobile', JSON.stringify(stateData));
+                localStorage.setItem('supervision_state_1448_v2', JSON.stringify(stateData));
             } catch (e) {
                 console.error("Save error", e);
             }
@@ -352,11 +425,11 @@
 
                 let statusBadgeHtml = '';
                 if (isPresent) {
-                    statusBadgeHtml = `<span class="print-badge text-emerald-700 bg-emerald-50 font-bold">متواجد</span>`;
+                    statusBadgeHtml = `<span class="print-badge text-emerald-700 bg-emerald-50">متواجد</span>`;
                 } else if (isAbsent) {
-                    statusBadgeHtml = `<span class="print-badge text-amber-700 bg-amber-50 font-bold">غياب / تأخر</span>`;
+                    statusBadgeHtml = `<span class="print-badge text-amber-700 bg-amber-50">غياب / تأخر</span>`;
                 } else {
-                    statusBadgeHtml = `<span class="print-badge text-slate-500 bg-slate-50">على الانتظار</span>`;
+                    statusBadgeHtml = `<span class="print-badge text-slate-600 bg-slate-50">على الانتظار</span>`;
                 }
 
                 tr.innerHTML = `
@@ -376,13 +449,13 @@
                                 <i class="fa-solid fa-xmark"></i> غياب / تأخر
                             </button>
                         </div>
-                        <div class="hidden screen-only-print">
+                        <div class="hidden" style="display: none; @media print { display: block !important; }">
                             ${statusBadgeHtml}
                         </div>
                     </td>
                     <td class="p-3.5">
                         <input type="text" value="${escapeHtml(note)}" oninput="updateNote('${currentDay}', ${index}, this.value)" placeholder="ملاحظة ميدانية..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 no-print">
-                        <span class="hidden screen-only-print text-xs text-slate-700">${escapeHtml(note) || '—'}</span>
+                        <span style="display: none; @media print { display: inline !important; }" class="text-xs text-slate-800">${escapeHtml(note) || '—'}</span>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -431,8 +504,8 @@
             document.getElementById('printVicePrincipalText').innerText = vpVal || "...................................";
             document.getElementById('printPrincipalText').innerText = pVal || "...................................";
 
-            // Set current formatted date
-            const todayDate = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' });
+            // Set current formatted date in Arabic (e.g., 20 ربيع الأول 1448 هـ)
+            const todayDate = new Date().toLocaleDateString('ar-SA-u-ca-islamic', { year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('printDateString').innerText = todayDate;
 
             window.print();
