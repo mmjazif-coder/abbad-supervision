@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>نظام متابعة الإشراف اليومي - مدرسة عباد بن بشر الابتدائية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-shadow { box-shadow: none !important; border: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-50 no-print">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2.5">
+                <div class="bg-white/10 p-2.5 rounded-xl">
+                    <i class="fa-solid fa-clipboard-user text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold leading-tight">إشراف عباد بن بشر</h1>
+                    <p class="text-[11px] text-emerald-200">نظام المتابعة اليومية (1448 هـ)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="resetCurrentDay()" class="bg-emerald-900/80 hover:bg-emerald-900 text-emerald-100 p-2 rounded-xl text-xs flex items-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-rotate-right text-xs"></i>
+                    <span class="hidden sm:inline">إعادة ضبط</span>
+                </button>
+                <button onclick="printReport()" class="bg-white text-emerald-800 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-50 transition-all">
+                    <i class="fa-solid fa-print"></i> طباعة
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 py-4 flex-grow w-full pb-20">
+        
+        <!-- Day Selection Tabs (Scrollable on mobile) -->
+        <div class="mb-4 no-print">
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none" id="dayTabsContainer">
+                <button onclick="setDay('الأحد')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-700 text-white shadow-sm" data-day="الأحد">الأحد</button>
+                <button onclick="setDay('الاثنين')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-day="الاثنين">الاثنين</button>
+                <button onclick="setDay('الثلاثاء')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-day="الثلاثاء">الثلاثاء</button>
+                <button onclick="setDay('الأربعاء')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-day="الأربعاء">الأربعاء</button>
+                <button onclick="setDay('الخميس')" class="day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50" data-day="الخميس">الخميس</button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-[11px] text-slate-500 font-semibold">المشرفين</span>
+                    <i class="fa-solid fa-users text-blue-500 text-xs"></i>
+                </div>
+                <h3 id="statTotal" class="text-xl font-black text-slate-800">0</h3>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-[11px] text-slate-500 font-semibold">متواجد</span>
+                    <i class="fa-solid fa-user-check text-emerald-500 text-xs"></i>
+                </div>
+                <h3 id="statPresent" class="text-xl font-black text-emerald-600">0</h3>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-[11px] text-slate-500 font-semibold">غائب/متأخر</span>
+                    <i class="fa-solid fa-user-clock text-amber-500 text-xs"></i>
+                </div>
+                <h3 id="statAbsent" class="text-xl font-black text-amber-600">0</h3>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl shadow-sm border border-slate-100">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="text-[11px] text-slate-500 font-semibold">الالتزام</span>
+                    <i class="fa-solid fa-chart-pie text-indigo-500 text-xs"></i>
+                </div>
+                <h3 id="statPercentage" class="text-xl font-black text-indigo-600">0%</h3>
+            </div>
+        </div>
+
+        <!-- Mobile Card List & Desktop Table Container -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6 print-shadow">
+            <div class="p-3.5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-700 text-xs sm:text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-emerald-600"></i> سجل المتابعة اليومية
+                </h3>
+                <span id="activeDayLabel" class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">اليوم: الأحد</span>
+            </div>
+
+            <!-- Mobile & Tablet Card List (Visible on smaller screens) -->
+            <div id="mobileCardsContainer" class="divide-y divide-slate-100 block md:hidden">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Desktop Table View (Hidden on mobile, visible on md+) -->
+            <div class="overflow-x-auto hidden md:block">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 text-slate-500 text-xs font-bold border-b border-slate-100">
+                            <th class="p-3.5">الفترة / الفسحة</th>
+                            <th class="p-3.5">موقع الإشراف</th>
+                            <th class="p-3.5">اسم المعلم المسؤول</th>
+                            <th class="p-3.5 text-center">الحالة</th>
+                            <th class="p-3.5">ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody" class="divide-y divide-slate-100 text-sm">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Management Signatures -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-slate-500">وكيل الشؤون التعليمية:</label>
+                <input type="text" id="vicePrincipal" placeholder="أدخل اسم الوكيل..." class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold text-slate-500">مدير المدرسة:</label>
+                <input type="text" id="principal" placeholder="أدخل اسم مدير المدرسة..." class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Official schedule data
+        const fullScheduleData = {
+            "الأحد": [
+                { period: "الفسحة الأولى (أولية)", location: "مدخل المبنى", teacher: "فهد محمد معافا" },
+                { period: "الفسحة الأولى (أولية)", location: "المقصف", teacher: "عيسى موسى البلوي" },
+                { period: "الفسحة الأولى (أولية)", location: "موقع 2", teacher: "خميس عنيزان البلوي" },
+                { period: "الفسحة الثانية (عليا)", location: "مدخل المبنى", teacher: "عبد الرحمن سعيد الشهري" },
+                { period: "الفسحة الثانية (عليا)", location: "المقصف", teacher: "بدر عبد الله المطيري" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 1", teacher: "سليمان أحمد نصيف" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 2", teacher: "علي محمد كريري" }
+            ],
+            "الاثنين": [
+                { period: "الفسحة الأولى (أولية)", location: "مدخل المبنى", teacher: "سلطان خلف العنزي" },
+                { period: "الفسحة الأولى (أولية)", location: "المقصف", teacher: "عبد الله محمد البلوي" },
+                { period: "الفسحة الأولى (أولية)", location: "موقع 2", teacher: "معاذ رمضان إبراهيم" },
+                { period: "الفسحة الثانية (عليا)", location: "مدخل المبنى", teacher: "عايد سلامة العنزي" },
+                { period: "الفسحة الثانية (عليا)", location: "المقصف", teacher: "خالد خلف الله البردي" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 1", teacher: "بندر حماد العطوي" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 2", teacher: "فهد سالم العنزي" }
+            ],
+            "الثلاثاء": [
+                { period: "الفسحة الأولى (أولية)", location: "مدخل المبنى", teacher: "نايف جزاع الحويطي" },
+                { period: "الفسحة الأولى (أولية)", location: "المقصف", teacher: "عبد الرحمن علي الشهري" },
+                { period: "الفسحة الأولى (أولية)", location: "موقع 2", teacher: "عبد الله صالح الشايع" },
+                { period: "الفسحة الثانية (عليا)", location: "مدخل المبنى", teacher: "أحمد عوده البلوي" },
+                { period: "الفسحة الثانية (عليا)", location: "المقصف", teacher: "علي أحمد عسيري" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 1", teacher: "حاتم حمود العطوي" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 2", teacher: "فهد إبراهيم العطوي" }
+            ],
+            "الأربعاء": [
+                { period: "الفسحة الأولى (أولية)", location: "مدخل المبنى", teacher: "ياسر بشير العنزي" },
+                { period: "الفسحة الأولى (أولية)", location: "المقصف", teacher: "ماجد عبد السلام الصباح" },
+                { period: "الفسحة الأولى (أولية)", location: "موقع 2", teacher: "سعد مشرف العمري" },
+                { period: "الفسحة الثانية (عليا)", location: "مدخل المبنى", teacher: "بدر محمد العمري" },
+                { period: "الفسحة الثانية (عليا)", location: "المقصف", teacher: "عبد الله عيسى العنزي" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 1", teacher: "محمد غانم العنزي" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 2", teacher: "علي سعيد العمري" }
+            ],
+            "الخميس": [
+                { period: "الفسحة الأولى (أولية)", location: "مدخل المبنى", teacher: "فهد منصور العمراني" },
+                { period: "الفسحة الأولى (أولية)", location: "المقصف", teacher: "محمد أحمد الشهري" },
+                { period: "الفسحة الأولى (أولية)", location: "موقع 2", teacher: "غالب علي البلوي" },
+                { period: "الفسحة الثانية (عليا)", location: "مدخل المبنى", teacher: "فايز سالم الجهني" },
+                { period: "الفسحة الثانية (عليا)", location: "المقصف", teacher: "عبد الإله محمد آل زين" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 1", teacher: "ناصر أحمد الشمراني" },
+                { period: "الفسحة الثانية (عليا)", location: "موقع 2", teacher: "علي ناصر كريري" }
+            ]
+        };
+
+        let currentDay = "الأحد";
+        let stateData = {};
+
+        try {
+            const saved = localStorage.getItem('supervision_state_1448_mobile');
+            if (saved) stateData = JSON.parse(saved);
+        } catch (e) {
+            console.error("Storage error", e);
+        }
+
+        function setDay(day) {
+            currentDay = day;
+            document.getElementById('activeDayLabel').innerText = `اليوم: ${day}`;
+
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                if (btn.getAttribute('data-day') === day) {
+                    btn.className = "day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-emerald-700 text-white shadow-sm";
+                } else {
+                    btn.className = "day-btn flex-shrink-0 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+                }
+            });
+
+            renderViews();
+        }
+
+        function setStatusAndRender(day, index, status) {
+            if (!stateData[day]) stateData[day] = {};
+            if (!stateData[day][index]) stateData[day][index] = {};
+            
+            if (stateData[day][index].status === status) {
+                stateData[day][index].status = 'pending';
+            } else {
+                stateData[day][index].status = status;
+            }
+            
+            saveState();
+            renderViews();
+        }
+
+        function updateNote(day, index, note) {
+            if (!stateData[day]) stateData[day] = {};
+            if (!stateData[day][index]) stateData[day][index] = {};
+            stateData[day][index].note = note;
+            saveState();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('supervision_state_1448_mobile', JSON.stringify(stateData));
+            } catch (e) {
+                console.error("Save error", e);
+            }
+            updateStatistics();
+        }
+
+        function renderViews() {
+            renderMobileCards();
+            renderDesktopTable();
+            updateStatistics();
+        }
+
+        function renderMobileCards() {
+            const container = document.getElementById('mobileCardsContainer');
+            container.innerHTML = '';
+            const items = fullScheduleData[currentDay] || [];
+
+            items.forEach((item, index) => {
+                const dayState = (stateData[currentDay] && stateData[currentDay][index]) || {};
+                const status = dayState.status || 'pending';
+                const note = dayState.note || '';
+
+                const isPresent = status === 'present';
+                const isAbsent = status === 'absent';
+
+                const card = document.createElement('div');
+                card.className = "p-3.5 flex flex-col gap-2.5";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded">${item.period}</span>
+                            <h4 class="font-bold text-slate-900 text-sm mt-1">${item.teacher}</h4>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100">
+                            <i class="fa-solid fa-location-dot ml-1"></i>${item.location}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button type="button" onclick="setStatusAndRender('${currentDay}', ${index}, 'present')" class="py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${isPresent ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-300' : 'bg-slate-100 text-slate-700 active:bg-emerald-50'}">
+                            <i class="fa-solid fa-check"></i> متواجد
+                        </button>
+                        <button type="button" onclick="setStatusAndRender('${currentDay}', ${index}, 'absent')" class="py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${isAbsent ? 'bg-amber-600 text-white shadow-sm ring-2 ring-amber-300' : 'bg-slate-100 text-slate-700 active:bg-amber-50'}">
+                            <i class="fa-solid fa-xmark"></i> غياب / تأخر
+                        </button>
+                    </div>
+                    <div>
+                        <input type="text" value="${escapeHtml(note)}" oninput="updateNote('${currentDay}', ${index}, this.value)" placeholder="إضافة ملاحظة ميدانية..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderDesktopTable() {
+            const tbody = document.getElementById('scheduleTableBody');
+            tbody.innerHTML = '';
+            const items = fullScheduleData[currentDay] || [];
+
+            items.forEach((item, index) => {
+                const dayState = (stateData[currentDay] && stateData[currentDay][index]) || {};
+                const status = dayState.status || 'pending';
+                const note = dayState.note || '';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-colors";
+
+                const isPresent = status === 'present';
+                const isAbsent = status === 'absent';
+
+                tr.innerHTML = `
+                    <td class="p-3.5 font-semibold text-slate-700">${item.period}</td>
+                    <td class="p-3.5">
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+                            ${item.location}
+                        </span>
+                    </td>
+                    <td class="p-3.5 font-bold text-slate-900">${item.teacher}</td>
+                    <td class="p-3.5">
+                        <div class="flex items-center justify-center gap-2">
+                            <button type="button" onclick="setStatusAndRender('${currentDay}', ${index}, 'present')" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1 ${isPresent ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-300' : 'bg-slate-100 text-slate-600 hover:bg-emerald-50'}">
+                                <i class="fa-solid fa-check"></i> متواجد
+                            </button>
+                            <button type="button" onclick="setStatusAndRender('${currentDay}', ${index}, 'absent')" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1 ${isAbsent ? 'bg-amber-600 text-white shadow-sm ring-2 ring-amber-300' : 'bg-slate-100 text-slate-600 hover:bg-amber-50'}">
+                                <i class="fa-solid fa-xmark"></i> غياب / تأخر
+                            </button>
+                        </div>
+                    </td>
+                    <td class="p-3.5">
+                        <input type="text" value="${escapeHtml(note)}" oninput="updateNote('${currentDay}', ${index}, this.value)" placeholder="ملاحظة ميدانية..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(text) {
+            return (text || '').replace(/"/g, '&quot;');
+        }
+
+        function updateStatistics() {
+            const items = fullScheduleData[currentDay] || [];
+            const total = items.length;
+            let present = 0;
+            let absent = 0;
+
+            items.forEach((_, index) => {
+                const status = stateData[currentDay]?.[index]?.status;
+                if (status === 'present') present++;
+                if (status === 'absent') absent++;
+            });
+
+            const percentage = total > 0 ? Math.round((present / total) * 100) : 0;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statPresent').innerText = present;
+            document.getElementById('statAbsent').innerText = absent;
+            document.getElementById('statPercentage').innerText = `${percentage}%`;
+        }
+
+        function resetCurrentDay() {
+            if (window.confirm(`هل أنت متأكد من إعادة ضبط بيانات يوم ${currentDay}؟`)) {
+                if (stateData[currentDay]) {
+                    delete stateData[currentDay];
+                    saveState();
+                    renderViews();
+                }
+            }
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        window.onload = function() {
+            setDay('الأحد');
+        };
+    </script>
+</body>
+</html>
